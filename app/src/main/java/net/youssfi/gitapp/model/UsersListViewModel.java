@@ -1,5 +1,6 @@
 package net.youssfi.gitapp.model;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import net.youssfi.gitapp.MainActivity;
 import net.youssfi.gitapp.R;
 
 import java.net.MalformedURLException;
@@ -40,13 +42,18 @@ public class UsersListViewModel extends ArrayAdapter<GitUser> {
         TextView textViewScore=listViewItem.findViewById(R.id.textViewScore);
         textViewLogin.setText(getItem(position).login);
         textViewScore.setText(String.valueOf(getItem(position).score));
-        try {
-            URL url=new URL(getItem(position).avatarUrl);
-            Bitmap bitmap= BitmapFactory.decodeStream(url.openStream());
-            imageViewUser.setImageBitmap(bitmap);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        new Thread(()->{
+            try {
+                URL url=new URL(getItem(position).avatarUrl);
+                Bitmap bitmap= BitmapFactory.decodeStream(url.openStream());
+                ((Activity)getContext()).runOnUiThread(()->{
+                    imageViewUser.setImageBitmap(bitmap);
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+
         //imageViewUser.setImageBitmap();
         return listViewItem;
     }
